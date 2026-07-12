@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - Fashion Store</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">FASHION STORE</a>
+            <div class="nav-actions">
+                <div id="auth-links"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="margin-top: 40px;">
+        <h2>My Orders</h2>
+        <div id="orders-container" style="margin-top: 20px;">
+            <!-- Orders load here -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if(!App.state.user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            try {
+                const orders = await App.api('/orders/');
+                const myOrders = orders.filter(o => o.customer_name === App.state.user.full_name).reverse();
+                
+                const container = document.getElementById('orders-container');
+                
+                if(myOrders.length === 0) {
+                    container.innerHTML = '<p>You have no past orders.</p>';
+                } else {
+                    container.innerHTML = myOrders.map(o => `
+                        <div class="cart-item" style="display: block; padding: 20px; border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 20px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
+                                <div>
+                                    <span style="color: var(--light-text)">Order Placed:</span> <br>
+                                    <strong>${o.order_date}</strong>
+                                </div>
+                                <div>
+                                    <span style="color: var(--light-text)">Total:</span> <br>
+                                    <strong>Rs. ${o.total_amount}</strong>
+                                </div>
+                                <div>
+                                    <span style="color: var(--light-text)">Order #</span> <br>
+                                    <strong>${o.order_id || o.id}</strong>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <h4 style="margin-bottom: 5px; color: ${o.delivery_status === 'Delivered' ? 'var(--success)' : 'var(--primary-color)'}">
+                                        Delivery Status: ${o.delivery_status}
+                                    </h4>
+                                    <p style="color: var(--light-text); font-size: 14px;">Payment: ${o.payment_method} (${o.payment_status})</p>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>

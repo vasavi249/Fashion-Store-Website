@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fashion Store</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">FASHION STORE</a>
+            
+            <div class="nav-links">
+                <a href="#" class="active">Men</a>
+                <a href="#">Women</a>
+                <a href="#">Kids</a>
+                <a href="#">Home & Living</a>
+                <a href="#">Beauty</a>
+            </div>
+
+            <div class="search-bar">
+                <span>🔍</span>
+                <input type="text" placeholder="Search for products, brands and more">
+            </div>
+
+            <div class="nav-actions">
+                <div id="auth-links"></div>
+                <div class="icon-btn" onclick="window.location.href='cart.html'">
+                    <span>🛒</span>
+                    <span>Cart</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="banner">
+        <div>
+            <h1>MEGA FASHION SALE</h1>
+            <p>Flat 50-80% Off on Top Brands</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2 style="margin-bottom: 20px;">Featured Products</h2>
+        <div class="product-grid" id="products-container">
+            <!-- Products will load here -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            App.loadProducts('products-container');
+        });
+    </script>
+</body>
+</html>

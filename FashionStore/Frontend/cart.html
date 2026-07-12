@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - Fashion Store</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">FASHION STORE</a>
+            <div class="nav-actions">
+                <div id="auth-links"></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container cart-layout">
+        <div class="cart-items">
+            <h2>Shopping Bag</h2>
+            <div id="cart-container" style="margin-top: 20px;">
+                <!-- Cart items load here -->
+            </div>
+        </div>
+        
+        <div class="cart-summary">
+            <h3 style="margin-bottom: 20px;">Price Details</h3>
+            <div class="summary-row">
+                <span>Total MRP</span>
+                <span id="summary-mrp">Rs. 0</span>
+            </div>
+            <div class="summary-row">
+                <span>Discount on MRP</span>
+                <span style="color: var(--success)">-Rs. 0</span>
+            </div>
+            <div class="summary-row">
+                <span>Convenience Fee</span>
+                <span>Rs. 99</span>
+            </div>
+            <div class="summary-row summary-total">
+                <span>Total Amount</span>
+                <span id="summary-total">Rs. 99</span>
+            </div>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="window.location.href='checkout.html'">PLACE ORDER</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if(!App.state.user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            try {
+                const carts = await App.api('/cart/');
+                // Filter carts by current user's name
+                const myCart = carts.filter(c => c.customer_name === App.state.user.full_name);
+                
+                const container = document.getElementById('cart-container');
+                let total = 0;
+                
+                if(myCart.length === 0) {
+                    container.innerHTML = '<p>Your cart is empty.</p>';
+                } else {
+                    container.innerHTML = myCart.map(c => {
+                        total += c.total_price;
+                        return `
+                            <div class="cart-item">
+                                <img src="https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=200" alt="Item" class="cart-item-img">
+                                <div class="cart-item-details">
+                                    <div style="font-weight: bold; margin-bottom: 5px;">${c.product_name}</div>
+                                    <div style="color: var(--light-text); font-size: 14px; margin-bottom: 10px;">Quantity: ${c.quantity}</div>
+                                    <div style="font-weight: bold;">Rs. ${c.price} <span style="font-size: 12px; color: var(--light-text); margin-left: 10px;">(Total: Rs. ${c.total_price})</span></div>
+                                </div>
+                                <button class="btn btn-outline" onclick="removeFromCart('${c.id}')">REMOVE</button>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+                document.getElementById('summary-mrp').textContent = `Rs. ${total}`;
+                document.getElementById('summary-total').textContent = `Rs. ${total > 0 ? total + 99 : 0}`;
+                
+            } catch (err) {
+                console.error(err);
+            }
+        });
+
+        async function removeFromCart(id) {
+            try {
+                await App.api(`/cart/delete/${id}/`, 'DELETE');
+                App.showToast('Item removed from cart');
+                setTimeout(() => window.location.reload(), 1000);
+            } catch(err) {
+                console.error(err);
+            }
+        }
+    </script>
+</body>
+</html>

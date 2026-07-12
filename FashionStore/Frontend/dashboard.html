@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Fashion Store Admin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <div class="sidebar-brand">Fashion Store Admin</div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="active">Dashboard</a>
+                <a href="#" onclick="alert('Manage Customers clicked')">Customers</a>
+                <a href="#" onclick="alert('Manage Categories clicked')">Categories</a>
+                <a href="#" onclick="alert('Manage Products clicked')">Products</a>
+                <a href="#" onclick="alert('Manage Orders clicked')">Orders</a>
+                <a href="index.html" style="margin-top: 50px;">Back to Store</a>
+            </nav>
+        </aside>
+        
+        <main class="admin-main">
+            <div class="admin-header">
+                <h2>Product Management</h2>
+                <button class="btn btn-primary" onclick="alert('Add Product Modal')">Add New Product</button>
+            </div>
+            
+            <table class="table" style="margin-bottom: 40px;">
+                <thead>
+                    <tr>
+                        <th>Product ID</th>
+                        <th>Name</th>
+                        <th>Brand</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="products-table"></tbody>
+            </table>
+            
+            <div class="admin-header">
+                <h2>Order Management</h2>
+            </div>
+            
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Payment Status</th>
+                        <th>Delivery Status</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-table"></tbody>
+            </table>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if(!App.state.user || (App.state.user.role !== 'admin' && App.state.user.email !== 'admin@movies.com')) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            try {
+                const products = await App.api('/products/');
+                document.getElementById('products-table').innerHTML = products.map(p => `
+                    <tr>
+                        <td>${p.product_id}</td>
+                        <td>${p.product_name}</td>
+                        <td>${p.brand}</td>
+                        <td>Rs. ${p.price}</td>
+                        <td>${p.stock}</td>
+                        <td>
+                            <button class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;">Edit</button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                const orders = await App.api('/orders/');
+                document.getElementById('orders-table').innerHTML = orders.map(o => `
+                    <tr>
+                        <td>${o.order_id || o.id}</td>
+                        <td>${o.customer_name}</td>
+                        <td>${o.order_date}</td>
+                        <td>Rs. ${o.total_amount}</td>
+                        <td style="color: ${o.payment_status === 'Paid' ? 'var(--success)' : 'orange'}">${o.payment_status}</td>
+                        <td>${o.delivery_status}</td>
+                    </tr>
+                `).join('');
+                
+            } catch(err) {
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>
