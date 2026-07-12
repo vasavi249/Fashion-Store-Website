@@ -1,0 +1,248 @@
+:root {
+    --primary: #0052cc;
+    --secondary: #172b4d;
+    --background: #f4f5f7;
+    --surface: #ffffff;
+    --text: #172b4d;
+    --text-light: #5e6c84;
+    --border: #dfe1e6;
+    --success: #36b37e;
+    --danger: #ff5630;
+    --warning: #ffab00;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--text);
+    line-height: 1.5;
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Navbar */
+.navbar {
+    background: var(--surface);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--secondary);
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links a {
+    color: var(--text-light);
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.nav-links a:hover, .nav-links a.active {
+    background: rgba(0, 82, 204, 0.1);
+    color: var(--primary);
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+/* Buttons */
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0047b3;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+}
+
+.btn-outline:hover {
+    background: rgba(0, 82, 204, 0.1);
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+/* Cards & Layout */
+.card {
+    background: var(--surface);
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.stat-card {
+    background: var(--surface);
+    padding: 20px;
+    border-radius: 4px;
+    border-left: 4px solid var(--primary);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.stat-title {
+    color: var(--text-light);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--secondary);
+}
+
+/* Tables */
+.table-container {
+    background: var(--surface);
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+th {
+    background: #fafbfc;
+    color: var(--text-light);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+td {
+    font-size: 14px;
+}
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-success { background: rgba(54, 179, 126, 0.1); color: var(--success); }
+.badge-warning { background: rgba(255, 171, 0, 0.1); color: var(--warning); }
+.badge-danger { background: rgba(255, 86, 48, 0.1); color: var(--danger); }
+
+/* Forms */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--secondary);
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 16px 24px;
+    border-radius: 4px;
+    color: white;
+    font-weight: 600;
+    z-index: 1000;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s;
+}
+
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.toast-success { background: var(--success); }
+.toast-error { background: var(--danger); }

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Payslips</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><span style="font-size: 28px; color: var(--primary)">🏢</span> EMP System</div>
+            <div class="nav-links" id="nav-links"></div>
+            <div class="auth-buttons" id="auth-buttons"></div>
+        </div>
+    </nav>
+
+    <div class="container" style="margin-top: 40px;">
+        <h2 style="margin-bottom: 24px;">My Salary Slips</h2>
+
+        <div class="grid-3" id="payslip-grid"></div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if(!App.state.user || App.state.user.role !== 'employee') {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                let payslips = await App.api('/payslips/');
+                payslips = payslips.filter(p => p.employee_name === App.state.user.full_name);
+
+                const container = document.getElementById('payslip-grid');
+                if(payslips.length === 0) {
+                    container.innerHTML = '<p>No payslips generated yet.</p>';
+                } else {
+                    container.innerHTML = payslips.map(p => `
+                        <div class="card" style="border-top: 4px solid var(--primary)">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                                <h3 style="color: var(--secondary);">Payslip #${p.payslip_id}</h3>
+                                <span class="badge badge-success">${p.payment_status}</span>
+                            </div>
+                            <p style="color: var(--text-light); margin-bottom: 5px;">Payment Date: <strong>${p.payment_date}</strong></p>
+                            <p style="color: var(--text-light); margin-bottom: 5px;">Method: ${p.payment_method}</p>
+                            <p style="color: var(--text-light); margin-bottom: 20px;">Remarks: ${p.remarks}</p>
+                            <button class="btn btn-outline" style="width: 100%;" onclick="alert('Downloading PDF...')">Download Slip</button>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {}
+        });
+    </script>
+</body>
+</html>

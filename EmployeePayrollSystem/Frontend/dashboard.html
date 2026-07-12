@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span style="font-size: 28px; color: var(--primary)">🏢</span>
+                EMP System
+            </div>
+            <div class="nav-links" id="nav-links"></div>
+            <div class="auth-buttons" id="auth-buttons"></div>
+        </div>
+    </nav>
+
+    <div class="container" style="margin-top: 40px;">
+        <h2 style="margin-bottom: 24px;">Dashboard Overview</h2>
+        
+        <div class="grid-3" style="margin-bottom: 30px;">
+            <div class="stat-card">
+                <div class="stat-title">Total Employees</div>
+                <div class="stat-value" id="stat-emp">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Total Departments</div>
+                <div class="stat-value" id="stat-dept">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Total Payroll Disbursed (Month)</div>
+                <div class="stat-value" id="stat-pay">Rs. 0</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-bottom: 20px;">Recent Attendance</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Employee Name</th>
+                            <th>Check In</th>
+                            <th>Check Out</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendance-table"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if(!App.state.user || App.state.user.role !== 'admin') {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const [emps, depts, payrolls, attendance] = await Promise.all([
+                    App.api('/employees/'),
+                    App.api('/departments/'),
+                    App.api('/payroll/'),
+                    App.api('/attendance/')
+                ]);
+
+                document.getElementById('stat-emp').textContent = emps.filter(e => e.role === 'employee').length;
+                document.getElementById('stat-dept').textContent = depts.length;
+                
+                const totalPay = payrolls.reduce((sum, p) => sum + p.net_salary, 0);
+                document.getElementById('stat-pay').textContent = `Rs. ${totalPay.toLocaleString()}`;
+
+                const tbody = document.getElementById('attendance-table');
+                tbody.innerHTML = attendance.slice(-5).reverse().map(a => {
+                    let badgeCls = a.status === 'Present' ? 'badge-success' : (a.status === 'Absent' ? 'badge-danger' : 'badge-warning');
+                    return `
+                        <tr>
+                            <td>${a.attendance_date}</td>
+                            <td>${a.employee_name}</td>
+                            <td>${a.check_in || '-'}</td>
+                            <td>${a.check_out || '-'}</td>
+                            <td><span class="badge ${badgeCls}">${a.status}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>

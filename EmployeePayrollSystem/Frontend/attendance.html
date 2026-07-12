@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><span style="font-size: 28px; color: var(--primary)">🏢</span> EMP System</div>
+            <div class="nav-links" id="nav-links"></div>
+            <div class="auth-buttons" id="auth-buttons"></div>
+        </div>
+    </nav>
+
+    <div class="container" style="margin-top: 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h2 id="page-title">Attendance History</h2>
+            <button class="btn btn-primary" id="btn-mark">Mark Today's Attendance</button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th id="th-name" style="display:none;">Employee Name</th>
+                        <th>Check In</th>
+                        <th>Check Out</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="att-table"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if(!App.state.user) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const isAdmin = App.state.user.role === 'admin';
+            
+            if(isAdmin) {
+                document.getElementById('page-title').textContent = 'Company Attendance Logs';
+                document.getElementById('btn-mark').style.display = 'none';
+                document.getElementById('th-name').style.display = 'table-cell';
+            }
+
+            try {
+                let attendance = await App.api('/attendance/');
+                
+                if(!isAdmin) {
+                    attendance = attendance.filter(a => a.employee_name === App.state.user.full_name);
+                }
+
+                document.getElementById('att-table').innerHTML = attendance.reverse().map(a => {
+                    let badgeCls = a.status === 'Present' ? 'badge-success' : (a.status === 'Absent' ? 'badge-danger' : 'badge-warning');
+                    return `
+                        <tr>
+                            <td>${a.attendance_date}</td>
+                            ${isAdmin ? `<td>${a.employee_name}</td>` : ''}
+                            <td>${a.check_in || '-'}</td>
+                            <td>${a.check_out || '-'}</td>
+                            <td><span class="badge ${badgeCls}">${a.status}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (err) {}
+        });
+
+        document.getElementById('btn-mark').addEventListener('click', async () => {
+            const date = new Date().toISOString().split('T')[0];
+            const data = {
+                attendance_id: Math.floor(Math.random() * 1000),
+                employee_name: App.state.user.full_name,
+                attendance_date: date,
+                check_in: "09:00",
+                check_out: "",
+                status: "Present"
+            };
+            try {
+                await App.api('/attendance/add/', 'POST', data);
+                App.showToast('Checked in successfully!');
+                setTimeout(() => window.location.reload(), 1000);
+            } catch(err) {}
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employees - Admin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><span style="font-size: 28px; color: var(--primary)">🏢</span> EMP System</div>
+            <div class="nav-links" id="nav-links"></div>
+            <div class="auth-buttons" id="auth-buttons"></div>
+        </div>
+    </nav>
+
+    <div class="container" style="margin-top: 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h2>Employee Directory</h2>
+            <button class="btn btn-primary" onclick="alert('Open Add Employee Modal')">+ Add Employee</button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Designation</th>
+                        <th>Salary</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="emp-table"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if(!App.state.user || App.state.user.role !== 'admin') {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            try {
+                const emps = await App.api('/employees/');
+                document.getElementById('emp-table').innerHTML = emps.filter(e => e.role === 'employee').map(e => `
+                    <tr>
+                        <td>#${e.employee_id}</td>
+                        <td style="font-weight: 600;">${e.full_name}</td>
+                        <td>${e.email}</td>
+                        <td>${e.department}</td>
+                        <td>${e.designation}</td>
+                        <td>Rs. ${e.salary.toLocaleString()}</td>
+                        <td>
+                            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;">Edit</button>
+                            <button class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {}
+        });
+    </script>
+</body>
+</html>
